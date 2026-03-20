@@ -29,8 +29,14 @@ public static class Program
         }
 
         Console.WriteLine("\n  Upgrade PR Agent starting (Ctrl+C to stop)\n");
+        var cycleCount = 0;
         while (!s_cts.IsCancellationRequested)
         {
+            // Check for self-updates at startup and every 10 cycles
+            if (cycleCount % 10 == 0)
+                await AutoUpdater.CheckAndUpdateAsync();
+            cycleCount++;
+
             try { await RunCycleAsync(config); }
             catch (Exception ex) { Log.Error($"Unhandled error in cycle: {ex.Message}"); }
 
