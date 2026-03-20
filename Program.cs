@@ -15,6 +15,9 @@ public static class Program
 
         Log.Verbose = config.Verbose;
 
+        // Check for self-updates before any mode
+        await AutoUpdater.CheckAndUpdateAsync();
+
         if (TryGetArg(args, "--pr", out var prStr) && int.TryParse(prStr, out var prNumber))
         {
             Console.WriteLine($"\n  Processing single PR #{prNumber}...\n");
@@ -32,8 +35,8 @@ public static class Program
         var cycleCount = 0;
         while (!s_cts.IsCancellationRequested)
         {
-            // Check for self-updates at startup and every 10 cycles
-            if (cycleCount % 10 == 0)
+            // Check for self-updates every 10 cycles
+            if (cycleCount > 0 && cycleCount % 10 == 0)
                 await AutoUpdater.CheckAndUpdateAsync();
             cycleCount++;
 

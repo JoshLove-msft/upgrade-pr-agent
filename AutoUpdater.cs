@@ -13,8 +13,9 @@ public static class AutoUpdater
     {
         try
         {
-            var current = Assembly.GetExecutingAssembly().GetName().Version;
-            var currentStr = $"{current!.Major}.{current.Minor}.{current.Build}";
+            var asm = Assembly.GetExecutingAssembly();
+            var currentStr = asm.GetCustomAttribute<AssemblyInformationalVersionAttribute>()
+                ?.InformationalVersion?.Split('+')[0] ?? "0.0.0";
 
             Log.Debug($"Current version: {currentStr}");
 
