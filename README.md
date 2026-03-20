@@ -16,12 +16,15 @@ them.
 5. **Merges** approved PRs (squash by default)
 6. **Skips** PRs that are superseded by a newer version
 
+## Install
+
+```powershell
+irm https://raw.githubusercontent.com/JoshLove-msft/upgrade-pr-agent/master/install.ps1 | iex
+```
+
 ## Quick start
 
 ```bash
-# Install (one line, no checkout needed)
-gh release download v1.0.0 -R JoshLove-msft/upgrade-pr-agent -p "*.nupkg" -D /tmp && dotnet tool install -g UpgradePrAgent --add-source /tmp && rm /tmp/UpgradePrAgent.1.0.0.nupkg
-
 # Dry-run -- see what it would do (safe, no changes)
 upgrade-pr-agent --once
 
