@@ -191,7 +191,7 @@ public static class Program
             PrStatus.ReadyToMerge => ("[MERG]", ConsoleColor.Green),
             PrStatus.Merged => ("[DONE]", ConsoleColor.DarkGray),
             PrStatus.Closed => ("[CLOS]", ConsoleColor.DarkGray),
-            PrStatus.Superseded => ("[SKIP]", ConsoleColor.DarkGray),
+            PrStatus.Superseded => ("[CLOS]", ConsoleColor.DarkGray),
             _ => ("[ ?? ]", ConsoleColor.Gray),
         };
 
@@ -206,7 +206,7 @@ public static class Program
         foreach (var check in analysis.CiFailedChecks.Take(3))
             Console.WriteLine($"         -> FAIL: {check}");
         if (analysis.IsSuperseded && analysis.NewerPrNumber is not null)
-            Console.WriteLine($"         -> Newer: #{analysis.NewerPrNumber}");
+            Console.WriteLine($"         -> Will close: superseded by #{analysis.NewerPrNumber}");
         Console.WriteLine();
     }
 
