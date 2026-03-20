@@ -38,6 +38,7 @@ public sealed class PrAnalysis
     public bool IsSuperseded { get; set; }
     public int? NewerPrNumber { get; set; }
     public bool Mergeable { get; set; }
+    public bool HasMergeConflicts { get; set; }
 }
 
 public static partial class Analyzer
@@ -73,6 +74,8 @@ public static partial class Analyzer
             HeadRef = pr.GetProperty("head").GetProperty("ref").GetString()!,
             Mergeable = pr.TryGetProperty("mergeable_state", out var ms)
                         && ms.GetString() == "clean",
+            HasMergeConflicts = pr.TryGetProperty("mergeable_state", out var ms2)
+                                && ms2.GetString() == "dirty",
         };
 
         CheckSuperseded(config, analysis, pr, allOpenPrs);
@@ -84,6 +87,12 @@ public static partial class Analyzer
 
         await CheckCiAsync(config, analysis);
         await CheckReviewsAsync(config, analysis);
+
+        // Detect merge conflicts as a fixable issue
+        if (analysis.HasMergeConflicts)
+            analysis.FixableIssues.Insert(0, new FixableIssue(
+                "Merge conflicts with base branch (will resolve using newest versions)",
+                "", "merge_conflicts"));
 
         // Fixable issues take priority -- the CI failure may be caused by them
         if (analysis.FixableIssues.Count > 0)
