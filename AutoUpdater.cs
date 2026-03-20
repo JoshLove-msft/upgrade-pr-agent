@@ -26,7 +26,9 @@ public static class AutoUpdater
             var release = JsonDocument.Parse(json).RootElement;
             var tag = release.GetProperty("tag_name").GetString()!.TrimStart('v');
 
-            if (tag == currentStr)
+            if (Version.TryParse(tag, out var remoteVer) &&
+                Version.TryParse(currentStr, out var localVer) &&
+                remoteVer <= localVer)
             {
                 Log.Debug("Already on latest version");
                 return false;

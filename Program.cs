@@ -1,3 +1,4 @@
+using System.Reflection;
 using System.Text.Json;
 
 namespace UpgradePrAgent;
@@ -14,6 +15,11 @@ public static class Program
         if (config is null) return 1;
 
         Log.Verbose = config.Verbose;
+
+        var version = Assembly.GetExecutingAssembly()
+            .GetCustomAttribute<AssemblyInformationalVersionAttribute>()
+            ?.InformationalVersion?.Split('+')[0] ?? "unknown";
+        Console.WriteLine($"\n  upgrade-pr-agent v{version}\n");
 
         // Check for self-updates before any mode
         await AutoUpdater.CheckAndUpdateAsync();
