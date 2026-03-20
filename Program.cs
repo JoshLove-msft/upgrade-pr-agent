@@ -106,10 +106,15 @@ public static class Program
 
         if (analysis.Status == PrStatus.Superseded)
         {
-            Log.Info($"PR #{prNumber} superseded by #{analysis.NewerPrNumber} -- skipping");
-            if (!config.DryRun)
+            Log.Info($"PR #{prNumber} superseded by #{analysis.NewerPrNumber} -- closing");
+            if (config.DryRun)
+                Log.Info($"[DRY RUN] Would close PR #{prNumber}");
+            else
+            {
                 await Gh.AddCommentAsync(config.Owner, config.Repo, prNumber,
                     $"Closing -- superseded by #{analysis.NewerPrNumber}.");
+                await Gh.ClosePrAsync(config.Owner, config.Repo, prNumber);
+            }
             return analysis;
         }
 

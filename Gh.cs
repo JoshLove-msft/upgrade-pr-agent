@@ -112,4 +112,7 @@ public static class Gh
     public static async Task AddCommentAsync(string owner, string repo, int number, string body) =>
         await ApiAsync($"/repos/{owner}/{repo}/issues/{number}/comments",
             method: "POST", fields: new() { ["body"] = body });
+
+    public static async Task<string> ClosePrAsync(string owner, string repo, int number) =>
+        await RunAsync("pr", "close", number.ToString(), "--repo", $"{owner}/{repo}");
 }
