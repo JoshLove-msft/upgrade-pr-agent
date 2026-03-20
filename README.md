@@ -19,20 +19,20 @@ them.
 ## Quick start
 
 ```bash
+# Install (one line, no checkout needed)
+gh release download v1.0.0 -R JoshLove-msft/upgrade-pr-agent -p "*.nupkg" -D /tmp && dotnet tool install -g UpgradePrAgent --add-source /tmp && rm /tmp/UpgradePrAgent.1.0.0.nupkg
+
 # Dry-run -- see what it would do (safe, no changes)
-dotnet run -- --once
+upgrade-pr-agent --once
 
 # Process a single PR
-dotnet run -- --pr 57270
+upgrade-pr-agent --pr 57270
 
 # Run continuously in dry-run mode
-dotnet run
+upgrade-pr-agent
 
 # Go live -- actually approve & merge
-dotnet run -- --live
-
-# Customize poll interval (seconds)
-dotnet run -- --live --interval 600
+upgrade-pr-agent --live
 ```
 
 ## Requirements

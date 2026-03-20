@@ -5,6 +5,11 @@
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>upgrade-pr-agent</ToolCommandName>
+    <PackageId>UpgradePrAgent</PackageId>
+    <Version>1.0.0</Version>
+    <Description>Agent that monitors, fixes, approves, and merges automated dependency upgrade PRs</Description>
   </PropertyGroup>
 
 </Project>
