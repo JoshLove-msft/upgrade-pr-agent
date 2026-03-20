@@ -19,6 +19,7 @@ public static class AutoUpdater
 
             Log.Debug($"Current version: {currentStr}");
 
+            Console.WriteLine("  Checking for updates...");
             using var http = new HttpClient();
             http.DefaultRequestHeaders.UserAgent.ParseAdd("UpgradePrAgent");
             var json = await http.GetStringAsync(
@@ -30,9 +31,11 @@ public static class AutoUpdater
                 Version.TryParse(currentStr, out var localVer) &&
                 remoteVer <= localVer)
             {
-                Log.Debug("Already on latest version");
+                Console.WriteLine("  Up to date.\n");
                 return false;
             }
+
+            Console.WriteLine($"  Updating to v{tag}...");
 
             Log.Info($"New version available: {tag} (current: {currentStr}). Updating...");
 
