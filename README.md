@@ -19,38 +19,38 @@ them.
 ## Quick start
 
 ```bash
-# Dry-run — see what it would do (safe, no changes)
-python agent.py --once
+# Dry-run -- see what it would do (safe, no changes)
+dotnet run -- --once
 
 # Process a single PR
-python agent.py --pr 57270
+dotnet run -- --pr 57270
 
 # Run continuously in dry-run mode
-python agent.py
+dotnet run
 
-# Go live — actually approve & merge
-python agent.py --live
+# Go live -- actually approve & merge
+dotnet run -- --live
 
 # Customize poll interval (seconds)
-python agent.py --live --interval 600
+dotnet run -- --live --interval 600
 ```
 
 ## Requirements
 
-- Python 3.12+
+- .NET 10 SDK
 - `gh` CLI authenticated (`gh auth login`)
 - Git
 - npm (for lockfile regeneration)
 
 ## Configuration
 
-Edit `config.py` or use CLI flags:
+Use CLI flags:
 
 | Flag | Default | Description |
 |------|---------|-------------|
 | `--live` | off | Enable approve/merge (default is dry-run) |
 | `--once` | off | Run one cycle then exit |
-| `--pr N` | — | Process a single PR |
+| `--pr N` | -- | Process a single PR |
 | `--interval N` | 300 | Seconds between poll cycles |
 | `--owner` | Azure | GitHub org/owner |
 | `--repo` | azure-sdk-for-net | Repository name |
@@ -60,13 +60,9 @@ Edit `config.py` or use CLI flags:
 
 ```
 PR Found
-  → CI pending?      → Wait
-  → CI failing?      → Log & skip
-  → Review issues?   → Attempt auto-fix → push → wait for CI
-  → CI green, no issues → Approve → Merge
-  → Superseded?      → Comment & skip
+  -> CI pending?      -> Wait
+  -> CI failing?      -> Log & skip (or fix if fixable issues detected)
+  -> Review issues?   -> Attempt auto-fix -> push -> wait for CI
+  -> CI green, no issues -> Approve -> Merge
+  -> Superseded?      -> Comment & skip
 ```
-
-## Logs
-
-All actions are logged to `upgrade-pr-agent.log` and stdout.
