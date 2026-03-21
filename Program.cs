@@ -119,6 +119,12 @@ public static class Program
         var analysis = await Analyzer.AnalyzePrAsync(config, prNumber, allOpenPrs);
         PrintStatus(analysis);
 
+        if (analysis.Status == PrStatus.DoNotMerge)
+        {
+            Log.Info($"PR #{prNumber} -- has 'Do Not Merge' label/title, skipping");
+            return analysis;
+        }
+
         if (analysis.Status == PrStatus.Superseded)
         {
             Log.Info($"PR #{prNumber} superseded by #{analysis.NewerPrNumber} -- closing");
@@ -201,6 +207,7 @@ public static class Program
             PrStatus.Merged => ("[DONE]", ConsoleColor.DarkGray),
             PrStatus.Closed => ("[CLOS]", ConsoleColor.DarkGray),
             PrStatus.Superseded => ("[CLOS]", ConsoleColor.DarkGray),
+            PrStatus.DoNotMerge => ("[SKIP]", ConsoleColor.DarkYellow),
             _ => ("[ ?? ]", ConsoleColor.Gray),
         };
 

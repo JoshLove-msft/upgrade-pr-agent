@@ -15,6 +15,7 @@ public enum PrStatus
     Merged,
     Closed,
     Superseded,
+    DoNotMerge,
     Unknown,
 }
 
@@ -78,6 +79,13 @@ public static partial class Analyzer
                                 && ms2.GetString() == "dirty",
         };
 
+        // Skip PRs with "Do Not Merge" label or title
+        if (HasDoNotMerge(pr))
+        {
+            analysis.Status = PrStatus.DoNotMerge;
+            return analysis;
+        }
+
         CheckSuperseded(config, analysis, pr, allOpenPrs);
         if (analysis.IsSuperseded)
         {
@@ -107,6 +115,28 @@ public static partial class Analyzer
             analysis.Status = PrStatus.ReadyToApprove;
 
         return analysis;
+    }
+
+    private static bool HasDoNotMerge(JsonElement pr)
+    {
+        // Check labels
+        if (pr.TryGetProperty("labels", out var labels))
+        {
+            foreach (var label in labels.EnumerateArray())
+            {
+                var name = label.TryGetProperty("name", out var n) ? n.GetString() : null;
+                if (name is not null &&
+                    name.Contains("do not merge", StringComparison.OrdinalIgnoreCase))
+                    return true;
+            }
+        }
+
+        // Check title
+        var title = pr.GetProperty("title").GetString() ?? "";
+        if (title.Contains("[DO NOT MERGE]", StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        return false;
     }
 
     private static void CheckSuperseded(
