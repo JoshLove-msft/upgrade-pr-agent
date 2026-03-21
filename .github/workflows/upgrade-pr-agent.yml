@@ -1,0 +1,58 @@
+name: Upgrade PR Agent
+
+on:
+  schedule:
+    # Run every 30 minutes
+    - cron: '*/30 * * * *'
+  workflow_dispatch:
+    inputs:
+      live:
+        description: 'Run in live mode (actually approve/merge)'
+        required: false
+        default: 'false'
+        type: boolean
+      pr:
+        description: 'Process a single PR number (leave empty for all)'
+        required: false
+        type: string
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  run-agent:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Build agent
+        run: dotnet build --configuration Release --nologo
+
+      - name: Run agent
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          args="--once"
+
+          # Scheduled runs are always dry-run unless the repo secret UPGRADE_PR_AGENT_LIVE is set
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" && "${{ inputs.live }}" == "true" ]]; then
+            args="$args --live"
+          elif [[ "${{ vars.UPGRADE_PR_AGENT_LIVE }}" == "true" ]]; then
+            args="$args --live"
+          fi
+
+          if [[ -n "${{ inputs.pr }}" ]]; then
+            args="--pr ${{ inputs.pr }}"
+            if [[ "${{ inputs.live }}" == "true" ]]; then
+              args="$args --live"
+            fi
+          fi
+
+          dotnet run --configuration Release --no-build -- $args

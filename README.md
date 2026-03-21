@@ -63,9 +63,24 @@ Use CLI flags:
 
 ```
 PR Found
+  -> "Do Not Merge"?  -> Skip entirely
+  -> Superseded?      -> Close with comment
+  -> Merge conflicts? -> Merge main, pick newest versions
   -> CI pending?      -> Wait
   -> CI failing?      -> Log & skip (or fix if fixable issues detected)
   -> Review issues?   -> Attempt auto-fix -> push -> wait for CI
   -> CI green, no issues -> Approve -> Merge
-  -> Superseded?      -> Comment & skip
 ```
+
+## Hosting in a repo via GitHub Actions
+
+This repo includes a workflow (`.github/workflows/upgrade-pr-agent.yml`) that
+runs the agent on a 30-minute cron schedule. To use it in another repo:
+
+1. Copy the workflow file and the agent source into the target repo
+2. Set the repo variable `UPGRADE_PR_AGENT_LIVE=true` to enable live mode
+   on scheduled runs (Settings > Secrets and variables > Actions > Variables)
+3. Or trigger manually via Actions > "Upgrade PR Agent" > Run workflow
+
+The workflow can also be triggered manually with options to run in live mode
+or target a specific PR number.

@@ -21,8 +21,9 @@ public static class Program
             ?.InformationalVersion?.Split('+')[0] ?? "unknown";
         Console.WriteLine($"\n  upgrade-pr-agent v{version}\n");
 
-        // Check for self-updates before any mode
-        await AutoUpdater.CheckAndUpdateAsync();
+        // Check for self-updates (skip in CI)
+        if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable("CI")))
+            await AutoUpdater.CheckAndUpdateAsync();
 
         if (TryGetArg(args, "--pr", out var prStr) && int.TryParse(prStr, out var prNumber))
         {
@@ -41,8 +42,9 @@ public static class Program
         var cycleCount = 0;
         while (!s_cts.IsCancellationRequested)
         {
-            // Check for self-updates every 10 cycles
-            if (cycleCount > 0 && cycleCount % 10 == 0)
+            // Check for self-updates every 10 cycles (skip in CI)
+            if (cycleCount > 0 && cycleCount % 10 == 0
+                && string.IsNullOrEmpty(Environment.GetEnvironmentVariable("CI")))
                 await AutoUpdater.CheckAndUpdateAsync();
             cycleCount++;
 
